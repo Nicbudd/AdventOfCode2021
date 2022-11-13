@@ -3,44 +3,48 @@
 #include <string.h>
 
 int main(){
-  FILE * fp = fopen("input.txt", "r");
+  FILE * fp = fopen("test.txt", "r");
   char * line = 0;
   size_t len = 0;
   ssize_t read;
 
-  int gamma_rate = 0;
-  int epsilon_rate = 0;
+  int stringLen = 5;
 
-  const int INPUTSIZE = 12;
+  int gamma_rate[stringLen];
+  int epsilon_rate[stringLen];
 
-  int perColumnSum[INPUTSIZE];
-  for (int i = 0; i < INPUTSIZE; i++){
-      perColumnSum[i] = 0;
+  for (int i = 0; i < stringLen; i++){
+    gamma_rate[i] = 0;
   }
 
-  int lineCount = 0;
+  int lCount = 0;
 
   while ((read = getline(&line, &len, fp)) != -1) {
-    for (int ch = 0; ch < INPUTSIZE; ch++){
-        perColumnSum[ch] += (line[ch] - '0');
+
+    char bin[stringLen];
+
+    sscanf(line, "%s/n", bin);
+
+    for (int ch = 0; ch < stringLen; ch++){
+      int digitVal = (int) bin[ch] - 48;
+      //printf("%d\n", digitVal);
+      gamma_rate[ch] += digitVal;
     }
-    lineCount++;
+
+    lCount++;
   }
+
+  printf("\n");
+
+  for (int ch = 0; ch < stringLen; ch++){
+    gamma_rate[ch] = (gamma_rate[ch] * 2) / lCount;
+    epsilon_rate[ch] = (gamma_rate[ch] * -1) + 1;
+    printf("%d", epsilon_rate[ch]);
+  }
+
+  int num = (int) strtol(gamma_rate, NULL, 2);
+
+  printf("%d\n", num);
 
   free(line);
-  free(fp);
-
-  for (int i = 0; i < INPUTSIZE; i++){
-      int overUnder = perColumnSum[i] > (lineCount / 2) ? 1 : 0; // if there are more 1s then make it a 1, otherwise make it a 0.
-      gamma_rate += overUnder << ((INPUTSIZE - 1) - i); // shift bit into correct place and add it to number
-
-  }
-
-  epsilon_rate = gamma_rate ^ ((1 << INPUTSIZE) - 1); // xor gamma_rate with all 1s
-
-  printf("%d\n", gamma_rate);
-  printf("%d\n", epsilon_rate);
-
-  printf("%d\n", gamma_rate * epsilon_rate);
-
 }
